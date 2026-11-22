@@ -6,3 +6,4 @@
   --doc:"Songti SC","STSong",Georgia,serif; --mono:"SFMono-Regular",Menlo,Consolas,monospace;
   --body:"PingFang SC","Microsoft YaHei",sans-serif; --row:36px; --pad:22px; --spine:196px;
 }
+.revisions .current th,.revisions .current td{background:var(--fold)}.correction-note{border-left:3px solid var(--ok)}.correction-entry textarea{font:inherit}.correction-entry form label{display:flex;gap:6px;align-items:center}.correction-entry input{font:inherit;border:1px solid var(--join);background:var(--paper);min-height:33px;padding:4px 8px;color:var(--ink)}.quiet{color:var(--quiet);font-size:13px}

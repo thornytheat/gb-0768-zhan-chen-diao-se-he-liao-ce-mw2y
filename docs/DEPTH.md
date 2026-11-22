@@ -14,6 +14,7 @@
 | M5 库存与损耗对账 | 按批号核对存量、损耗与回桶申报 | `GET /api/trial/dirty/balance` | `app/blend/balance.py` `app/blend/claims.py` | `tests/test_balance.py` |
 | M6 批次留档复跑 | 封存工单及重跑 | `POST /api/books` | `app/ledger/bookshelf.py` `app/ledger/closeout.py` | `tests/test_history.py` |
 | M7 收据证据签发 | 签发可独立复核的成分收据 | `GET /api/export/{key}` | `app/ledger/signoff.py` | `tests/test_receipt.py` |
+| M8 皮重更正签发 | 对已封存工单补报皮重并重算同罐后续用料与回桶成分 | `POST /api/books/{key}/corrections` | `app/ledger/correction.py` | `tests/test_corrections.py` |
 
 ## 陷阱登记
 
@@ -30,12 +31,17 @@
 | TRAP-15 | g、kg、mg 混用 | 净重差几个数量级 | 转整数毫克 | `app/receipts/units.py` | `tests/test_tares.py::test_mass_units` |
 | TRAP-24 | 等余数 | 尾差归属漂移 | 余数相同按批号 | `app/blend/share.py` | `tests/test_recovery.py::test_exact_rounding_residue` |
 | TRAP-25 | 两种皮重同时生效 | 误取第一或最后版本 | 双版本保留且隔离 | `app/receipts/tare.py` | `tests/test_tares.py::test_overlapping_tare_versions` |
+| TRAP-26 | 已签发收据补报皮重 | 直接改旧收据使展陈方留存数对不上，或只改旧账让同罐后续沿用错净重 | 旧留档不倒写；另签发修订版，按新皮重重放同罐后续用料与回桶成分 | `app/ledger/correction.py` | `tests/test_corrections.py::test_correcting_signed_tare_keeps_original` `tests/test_corrections.py::test_correction_recomputes_same_pot_usage_and_return` |
+| TRAP-27 | 更正重算失败 | 半成品收据覆盖可用旧版 | 重算异常或新隔离/失衡时拒绝签发，旧版可继续下载 | `app/ledger/correction.py` | `tests/test_corrections.py::test_failed_recompute_keeps_usable_old_version` |
+| TRAP-28 | 重试同一更正 | 同一皮重差异重复签发多版 | 修订键取父留档与规范化皮重差异，重试复用同键并原子发布 | `app/ledger/identity.py` `app/ledger/correction.py` | `tests/test_corrections.py::test_retrying_same_correction_does_not_issue_twice` `tests/test_corrections.py::test_concurrent_identical_correction_issues_once` |
 
 ## 对账规则
 
 - 秤单 40 = 入册 34 + 隔离 5 + 重复表头 1。后续 3 张皮重隔离、2 张批号隔离、1 张超量，回放 28 张。
 - 每批号期初 + 领用 = 上件 + 损耗 + 回桶余料 + 争议留罐，实收与申报差异另外对照。
 - 规则版本与全原件的 SHA-256 构成工单留档键；同目录临时文件写入并同步后，以原子硬链接发布。
+- 更正收据以「父留档键 + 规范化皮重差异」生成修订键，同键只签发一次；原件与更早修订永久保留，`GET /api/books/{key}/revisions` 给出沿革。
+- 重算在落盘前完成：原已计价票失去皮重、出现新回桶隔离、成分失衡或任何异常都不签发，旧版保持可用。
 
 ## 已知边界
 

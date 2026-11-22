@@ -26,6 +26,8 @@ python -m pytest -q
 
 试算入口为 `GET /api/trial/{dirty|clean}/{stage}`。阶段名见深度登记。自有原件可提交 `POST /api/books`，JSON 用 `sheets` 包含 `job`、`weights`、`tares`、`lots`、`claims` 的 UTF-8 文本，也可使用 `{"sample":"dirty"}`。`GET /api/books` 查历史，`GET /api/books/{key}` 查单册库存，`GET /api/export/{key}` 下载证据。
 
+4. 封存后若补报皮重，在「容器皮重」页对已签发工单提交更正。工作台另签发一版改正收据：旧收据与展陈方留存的数不变，新收据按更正后的皮重重算同罐后续用料与回桶成分，并在「证据签发」页给出修订沿革。重算失败时旧版仍可下载，重试同一更正不会重复签发。接口见 `POST /api/books/{key}/corrections` 与 `GET /api/books/{key}/revisions`。
+
 - [数据定义](docs/DATA-DICTIONARY.md)
 - [模块与陷阱](docs/DEPTH.md)
 - [复核一张回桶票](docs/RECEIPT-REVIEW.md)

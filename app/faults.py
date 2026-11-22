@@ -13,4 +13,5 @@ REASONS = {
     'LOT_UNKNOWN':'颜料别名未登记', 'LOT_CONFLICT':'别名关联多个批号', 'MIXED_OUTPUT':'混料动作不得指定单一批号',
     'OVERDRAW':'净重超过罐内存量', 'CLAIM_CONFLICT':'同批申报值冲突', 'NO_CLAIM':'无回桶申报',
     'MISMATCH':'回桶差异', 'MATCH':'账实一致', 'ACCEPTED':'已采信',
+    'CORRECTION_INVALID':'皮重更正不合法', 'CORRECTION_UNSTABLE':'更正重算失败，旧收据仍有效',
 }
